@@ -9,7 +9,8 @@ description = "Interpretable clustering and graph-based visualization of paintin
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-  { name = "Anna Chizhik" }
+  { name = "Anna Chizhik" },
+  { name = "Katarina Čokrlić" }
 ]
 license = { text = "MIT" }
 keywords = ["art", "museums", "computer-vision", "clustering", "digital-humanities"]
