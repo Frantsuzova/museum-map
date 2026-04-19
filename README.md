@@ -6,7 +6,27 @@ The package is designed for exploratory work with art collections, especially in
 
 The intended audience includes researchers in digital humanities, museum professionals, curators, collection managers, and computational analysts working with visual collections.
 
----
+## Installation
+
+Install from PyPI:
+
+```bash
+pip install museum-map
+```
+
+Or install the latest development version from GitHub:
+
+```bash
+pip install git+https://github.com/Frantsuzova/museum-map.git
+```
+
+For local development:
+
+```bash
+git clone https://github.com/Frantsuzova/museum-map.git
+cd museum-map
+pip install -e .
+```
 
 ## What the package does
 
@@ -27,18 +47,6 @@ Given a folder of painting images, `museum-map`:
 
 This workflow is intended to support exploratory analysis of collections and to help identify non-obvious relationships between paintings.
 
----
-
-## Installation
-
-The intended installation method is:
-
-```bash
-pip install museum-map
-```
-
----
-
 ## Quick start
 
 ### Minimal Python usage
@@ -56,8 +64,6 @@ print(pipeline.export_zip_path_)
 ```
 
 This is the simplest one-line workflow: point the package to a folder with images and receive an exported interactive result.
-
----
 
 ## What input data can be used
 
@@ -98,8 +104,6 @@ my_collection/
 
 If metadata such as artist, style, genre, accession number, or inventory ID is available, it can be integrated in future versions. In the current scaffold, unknown values are filled with placeholder labels.
 
----
-
 ## How to prepare data for the module
 
 The simplest workflow is:
@@ -120,8 +124,6 @@ build_museum_map(
 ```
 
 The package recursively scans the input directory and collects all supported images.
-
----
 
 ## Example directory structure
 
@@ -146,8 +148,6 @@ pipeline = build_museum_map(
     output_dir="project/out/run_01",
 )
 ```
-
----
 
 ## Main output files
 
@@ -187,8 +187,6 @@ output_dir/
 - `thumbs/` — thumbnails used inside the HTML graph
 - `museum_map_export.zip` — packaged result for local sharing or archiving
 
----
-
 ## What the HTML output contains
 
 The main visual artifact is `similarity_graph.html`.
@@ -214,8 +212,6 @@ Then open:
 ```text
 http://localhost:8000/similarity_graph.html
 ```
-
----
 
 ## Configuration
 
@@ -250,8 +246,6 @@ Important parameters include:
 - `max_per_cluster_for_graph` — representative sample size per cluster
 - `thumb_size` — thumbnail size used in the HTML graph
 
----
-
 ## Current limitations
 
 At the current stage, the package has several deliberate limitations:
@@ -264,21 +258,17 @@ At the current stage, the package has several deliberate limitations:
 
 These points are expected development directions rather than defects.
 
----
-
 ## Roadmap
 
 Planned next steps include:
 
-- PyPI publication (`pip install museum-map`)
 - command-line interface
 - optional metadata ingestion from CSV/JSON
 - optional museum map scatter export
 - cluster summaries and automatic cluster labels
 - graph-aware extensions such as Node2Vec
 - richer support for digital humanities and museum collection workflows
-
----
+- automated release workflow for PyPI
 
 ## Minimal example
 
@@ -294,14 +284,10 @@ print("Graph saved to:", pipeline.graph_html_path_)
 print("ZIP saved to:", pipeline.export_zip_path_)
 ```
 
----
-
 ## Citation
 
-If you use this repository in academic work, cite the corresponding paper once it is publicly available.
-
----
+If you use this package in academic work, please cite the corresponding paper or software record. A suggested citation file is included as `CITATION.cff`.
 
 ## License
 
-Specify a license before public release, for example MIT, Apache-2.0, or another project-appropriate license.
+This project is distributed under the MIT License. See `LICENSE` for details.

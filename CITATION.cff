@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+title: "museum-map"
+message: "If you use this software, please cite it using the metadata below."
+type: software
+authors:
+  - family-names: "Chizhik"
+    given-names: "Anna"
+repository-code: "https://github.com/Frantsuzova/museum-map"
+url: "https://github.com/Frantsuzova/museum-map"
+abstract: "Python package for interpretable clustering and graph-based visualization of painting collections."
+license: "MIT"
+version: "0.1.1"
+date-released: 2026-04-20

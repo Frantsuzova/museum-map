@@ -1,9 +1,8 @@
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
 *.so
+*.pyd
 *.egg-info/
 .eggs/
 build/
@@ -14,17 +13,15 @@ dist/
 venv/
 env/
 
-# Testing / coverage
+# Tests and coverage
 .pytest_cache/
 .coverage
 htmlcov/
-.mypy_cache/
-.ruff_cache/
 
-# Jupyter / notebooks
+# Jupyter
 .ipynb_checkpoints/
 
-# OS / editors
+# OS / editor
 .DS_Store
 Thumbs.db
 .vscode/

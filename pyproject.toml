@@ -4,12 +4,27 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "museum-map"
-version = "0.1.0"
+version = "0.1.1"
 description = "Interpretable clustering and graph-based visualization of painting collections"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-  { name = "Your Name" }
+  { name = "Anna Chizhik" }
+]
+license = { text = "MIT" }
+keywords = ["art", "museums", "computer-vision", "clustering", "digital-humanities"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Education",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Multimedia :: Graphics",
 ]
 dependencies = [
   "numpy>=1.26",
@@ -24,6 +39,11 @@ dependencies = [
   "transformers>=4.40",
   "tqdm>=4.66"
 ]
+
+[project.urls]
+Homepage = "https://github.com/Frantsuzova/museum-map"
+Repository = "https://github.com/Frantsuzova/museum-map"
+Issues = "https://github.com/Frantsuzova/museum-map/issues"
 
 [tool.setuptools]
 include-package-data = true
