@@ -31,11 +31,13 @@ This workflow is intended to support exploratory analysis of collections and to 
 
 ## Installation
 
-### Current development install
+The intended installation method is:
 
-At the current stage, the package is meant to be installed from source.
+```bash
+pip install museum-map
+```
 
-Clone the repository and install it locally:
+At the current stage, this command reflects the target distribution model for the package. If the package has not yet been published to PyPI, install it from the repository source instead:
 
 ```bash
 git clone https://github.com/<your-username>/museum-map.git
@@ -48,16 +50,6 @@ For editable development install:
 ```bash
 pip install -e .
 ```
-
-### Planned PyPI install
-
-Publishing to PyPI is the next step in development. The intended install command is:
-
-```bash
-pip install museum-map
-```
-
-This command is **not active yet** until the package is published.
 
 ---
 
