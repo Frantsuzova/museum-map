@@ -3,8 +3,10 @@ title: "museum-map"
 message: "If you use this software, please cite it using the metadata below."
 type: software
 authors:
-  - family-names: "Chizhik"
-    given-names: "Anna"
+  - family-names: Chizhik
+    given-names: Anna
+  - family-names: Čokrlić
+    given-names: Katarina
 repository-code: "https://github.com/Frantsuzova/museum-map"
 url: "https://github.com/Frantsuzova/museum-map"
 abstract: "Python package for interpretable clustering and graph-based visualization of painting collections."
