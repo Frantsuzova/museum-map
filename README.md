@@ -37,20 +37,6 @@ The intended installation method is:
 pip install museum-map
 ```
 
-At the current stage, this command reflects the target distribution model for the package. If the package has not yet been published to PyPI, install it from the repository source instead:
-
-```bash
-git clone https://github.com/<your-username>/museum-map.git
-cd museum-map
-pip install .
-```
-
-For editable development install:
-
-```bash
-pip install -e .
-```
-
 ---
 
 ## Quick start
