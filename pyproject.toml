@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "museum-map"
+version = "0.1.0"
+description = "Interpretable clustering and graph-based visualization of painting collections"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Your Name" }
+]
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "pillow>=10.0",
+  "scikit-learn>=1.4",
+  "umap-learn>=0.5.6",
+  "hdbscan>=0.8.33",
+  "opencv-python-headless>=4.10",
+  "pyvis>=0.3.2",
+  "torch>=2.2",
+  "transformers>=4.40",
+  "tqdm>=4.66"
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["museum_map*"]
