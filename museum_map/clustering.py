@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import numpy as np
 import hdbscan
+import numpy as np
 import umap
 from sklearn.preprocessing import StandardScaler
 
@@ -17,6 +17,7 @@ def combine_features(
     x_clip = StandardScaler().fit_transform(clip_embs) * weight_clip
     x_palette = StandardScaler().fit_transform(palette_feats) * weight_palette
     x_comp = StandardScaler().fit_transform(comp_feats) * weight_composition
+
     return np.hstack([x_clip, x_palette, x_comp])
 
 

@@ -18,6 +18,7 @@ from .utils import list_images
 class MuseumMapPipeline:
     def __init__(self, config: MuseumMapConfig) -> None:
         self.config = config
+
         self.records_: pd.DataFrame | None = None
         self.clip_embs_: np.ndarray | None = None
         self.palette_feats_: np.ndarray | None = None
@@ -34,6 +35,7 @@ class MuseumMapPipeline:
         cfg.output_path.mkdir(parents=True, exist_ok=True)
 
         image_paths = list_images(cfg.input_path)
+
         self.records_ = pd.DataFrame(
             {
                 "id": list(range(len(image_paths))),
@@ -45,12 +47,17 @@ class MuseumMapPipeline:
         )
 
         embedder = ClipImageEmbedder(model_name=cfg.clip_model_name)
-        self.clip_embs_ = embedder.transform(image_paths, batch_size=cfg.batch_size)
+        self.clip_embs_ = embedder.transform(
+            image_paths,
+            batch_size=cfg.batch_size,
+        )
+
         self.palette_feats_ = build_palette_matrix(
             image_paths,
             n_colors=cfg.n_palette_colors,
             resize=cfg.image_size,
         )
+
         self.comp_feats_ = build_composition_matrix(
             image_paths,
             resize=cfg.image_size,
@@ -83,6 +90,7 @@ class MuseumMapPipeline:
         self.df_plot_["cluster"] = self.labels_.astype(int)
         self.df_plot_["x"] = self.umap_2d_[:, 0]
         self.df_plot_["y"] = self.umap_2d_[:, 1]
+
         return self
 
     def build_graph(self) -> Path:
@@ -94,6 +102,7 @@ class MuseumMapPipeline:
             max_per_cluster=self.config.max_per_cluster_for_graph,
             random_state=self.config.random_state,
         )
+
         graph_features = self.features_[selected_idx]
 
         self.graph_html_path_ = build_similarity_graph_html(
@@ -104,6 +113,7 @@ class MuseumMapPipeline:
             thumb_size=self.config.thumb_size,
             thumb_border_px=self.config.thumb_border_px,
         )
+
         return self.graph_html_path_
 
     def save_artifacts(self) -> None:
@@ -111,27 +121,41 @@ class MuseumMapPipeline:
             raise RuntimeError("Call fit() before save_artifacts().")
 
         out = self.config.output_path
+
         np.save(out / "clip_embeddings.npy", self.clip_embs_)
         np.save(out / "palette_features.npy", self.palette_feats_)
         np.save(out / "composition_features.npy", self.comp_feats_)
         np.save(out / "feature_matrix.npy", self.features_)
         np.save(out / "umap_2d.npy", self.umap_2d_)
         np.save(out / "cluster_labels.npy", self.labels_)
+
         self.df_plot_.to_csv(out / "df_plot.csv", index=False)
         pd.DataFrame([asdict(self.config)]).to_csv(out / "config.csv", index=False)
 
     def export(self) -> Path:
         self.save_artifacts()
+
         if self.graph_html_path_ is None:
             self.build_graph()
+
         self.export_zip_path_ = make_export_zip(self.config.output_path)
         return self.export_zip_path_
 
 
-def build_museum_map(input_dir: str | Path, output_dir: str | Path, **kwargs) -> MuseumMapPipeline:
-    config = MuseumMapConfig(input_dir=input_dir, output_dir=output_dir, **kwargs)
+def build_museum_map(
+    input_dir: str | Path,
+    output_dir: str | Path,
+    **kwargs,
+) -> MuseumMapPipeline:
+    config = MuseumMapConfig(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        **kwargs,
+    )
+
     pipeline = MuseumMapPipeline(config)
     pipeline.fit()
     pipeline.build_graph()
     pipeline.export()
+
     return pipeline

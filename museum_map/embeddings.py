@@ -29,13 +29,25 @@ class ClipImageEmbedder:
         all_embs: list[np.ndarray] = []
         total_batches = (len(filepaths) + batch_size - 1) // batch_size
 
-        for batch_paths in tqdm(_batch_iter(filepaths, batch_size), total=total_batches, desc="CLIP embeddings"):
+        for batch_paths in tqdm(
+            _batch_iter(filepaths, batch_size),
+            total=total_batches,
+            desc="CLIP embeddings",
+        ):
             images = [Image.open(path).convert("RGB") for path in batch_paths]
-            inputs = self.processor(images=images, return_tensors="pt", padding=True).to(self.device)
+            inputs = self.processor(
+                images=images,
+                return_tensors="pt",
+                padding=True,
+            ).to(self.device)
 
             with torch.no_grad():
                 outputs = self.model.vision_model(pixel_values=inputs["pixel_values"])
-                pooled = outputs.pooler_output if outputs.pooler_output is not None else outputs.last_hidden_state[:, 0, :]
+                if outputs.pooler_output is not None:
+                    pooled = outputs.pooler_output
+                else:
+                    pooled = outputs.last_hidden_state[:, 0, :]
+
                 feats = self.model.visual_projection(pooled)
                 feats = _l2_normalize(feats)
 
