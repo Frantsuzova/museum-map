@@ -8,6 +8,8 @@ from pathlib import Path
 class MuseumMapConfig:
     input_dir: str | Path
     output_dir: str | Path
+    metadata_csv: str | Path | None = None
+
     image_size: int = 256
     batch_size: int = 32
     n_palette_colors: int = 5
@@ -39,3 +41,9 @@ class MuseumMapConfig:
     @property
     def output_path(self) -> Path:
         return Path(self.output_dir)
+
+    @property
+    def metadata_path(self) -> Path | None:
+        if self.metadata_csv is None:
+            return None
+        return Path(self.metadata_csv)
