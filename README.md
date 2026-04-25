@@ -6,7 +6,7 @@ The package is designed for exploratory work with art collections, especially in
 
 The intended audience includes researchers in digital humanities, museum professionals, curators, collection managers, and computational analysts working with visual collections.
 
-demo-results [https://frantsuzova.github.io/museum-map-demo/]
+[demo-results] (https://frantsuzova.github.io/museum-map-demo/)
 
 ## Installation
 
