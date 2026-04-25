@@ -2,7 +2,17 @@
 
 `museum-map` is a Python package for interpretable clustering and graph-based visualization of painting collections.
 
-The package is designed for exploratory work with art collections, especially in contexts where users need not only a clustering result, but also a visual and inspectable representation of relationships between artworks. The current implementation combines CLIP-based image embeddings with explicitly defined visual descriptors for color distribution and spatial composition, projects the resulting feature space, detects clusters, and exports an interactive similarity graph with painting thumbnails.
+The package is designed for exploratory work with art collections. It is useful when users need not only a clustering result, but also a visual and inspectable representation of relationships between artworks.
+
+The current implementation combines:
+
+- CLIP-based image embeddings
+- palette-based visual descriptors
+- composition-based visual descriptors
+- UMAP projection
+- HDBSCAN clustering
+- k-nearest-neighbor similarity graph export
+- optional metadata ingestion from CSV
 
 The intended audience includes researchers in digital humanities, museum professionals, curators, collection managers, and computational analysts working with visual collections.
 
@@ -14,6 +24,12 @@ Install from PyPI:
 
 ```bash
 pip install museum-map
+```
+
+Install a specific version:
+
+```bash
+pip install museum-map==0.1.3
 ```
 
 Or install the latest development version from GitHub:
@@ -42,16 +58,17 @@ Given a folder of painting images, `museum-map`:
 - selects representative paintings from each cluster
 - builds an interactive HTML graph where:
   - each node is a painting
-  - node image = painting thumbnail
-  - node border color = cluster membership
-  - edges = local similarity relationships
-- exports intermediate artifacts and a ready-to-share zip archive
+  - node image is a painting thumbnail
+  - node border color indicates cluster membership
+  - edges indicate local visual similarity
+  - metadata can be shown for each painting
+- exports intermediate artifacts and a lightweight ready-to-share archive
 
-This workflow is intended to support exploratory analysis of collections and to help identify non-obvious relationships between paintings.
+The workflow is intended to support exploratory analysis of collections and help identify non-obvious relationships between paintings.
 
 ## Quick start
 
-### Minimal Python usage
+### Minimal usage without metadata
 
 ```python
 from museum_map import build_museum_map
@@ -65,13 +82,32 @@ print(pipeline.graph_html_path_)
 print(pipeline.export_zip_path_)
 ```
 
-This is the simplest one-line workflow: point the package to a folder with images and receive an exported interactive result.
+This is the simplest workflow: point the package to a folder with images and receive an exported interactive result.
 
-## What input data can be used
+### Usage with metadata
 
-The package currently expects a **local folder of images**.
+If metadata is available, pass it as a CSV file:
 
-Supported image extensions are:
+```python
+from museum_map import build_museum_map
+
+pipeline = build_museum_map(
+    input_dir="/path/to/paintings",
+    output_dir="/path/to/output",
+    metadata_csv="/path/to/metadata.csv",
+)
+
+print(pipeline.graph_html_path_)
+print(pipeline.export_zip_path_)
+```
+
+The metadata is preserved in `df_plot.csv` and used in the HTML graph.
+
+## Input data
+
+The package expects a local folder of images.
+
+Supported image extensions:
 
 - `.jpg`
 - `.jpeg`
@@ -81,66 +117,72 @@ Supported image extensions are:
 - `.tif`
 - `.tiff`
 
-### Typical input scenarios
-
 You can use:
 
 - a subset of a public art dataset such as WikiArt
 - a digitized museum collection exported as image files
 - a folder with paintings gathered for a pilot experiment
-- a thematic subcollection, for example portraits, landscapes, or one author’s works
+- a thematic subcollection, for example portraits, landscapes, or one artist's works
 
-### Current assumptions about metadata
+## Metadata format
 
-The current pipeline is image-first. It does **not require metadata** to run.
+Metadata is optional. The pipeline can run without it.
 
-This means you can start with a plain folder of images:
+If you provide metadata, use a CSV file with a required `filepath` column.
+
+Recommended columns:
 
 ```text
-my_collection/
-├── painting_001.jpg
-├── painting_002.jpg
-├── painting_003.png
-└── ...
+filepath,artist,style,genre
 ```
-
-If metadata such as artist, style, genre, accession number, or inventory ID is available, it can be integrated in future versions. In the current scaffold, unknown values are filled with placeholder labels.
-
-## How to prepare data for the module
-
-The simplest workflow is:
-
-1. Create a folder containing only painting images.
-2. Pass the folder path as `input_dir`.
-3. Specify an `output_dir` where results should be written.
 
 Example:
 
-```python
-from museum_map import build_museum_map
-
-build_museum_map(
-    input_dir="./data/paintings",
-    output_dir="./out/museum_map_run_01",
-)
+```csv
+filepath,artist,style,genre
+data/paintings/img_00001.jpg,vincent-van-gogh,Post_Impressionism,landscape
+data/paintings/img_00002.jpg,claude-monet,Impressionism,landscape
+data/paintings/img_00003.jpg,Unknown Artist,Early_Renaissance,religious_painting
 ```
 
-The package recursively scans the input directory and collects all supported images.
+Only `filepath` is required. If `artist`, `style`, or `genre` are missing, they are filled with `unknown`.
 
-## Example directory structure
+Metadata matching is performed in two steps:
+
+1. exact normalized filepath matching
+2. filename fallback
+
+This means metadata can still be matched if images were moved to another folder but filenames stayed the same.
+
+## How to prepare data
+
+The simplest folder structure is:
 
 ```text
 project/
 ├── data/
 │   └── paintings/
-│       ├── aivazovsky_001.jpg
-│       ├── monet_014.jpg
-│       ├── shishkin_003.jpg
+│       ├── img_00001.jpg
+│       ├── img_00002.jpg
+│       ├── img_00003.png
 │       └── ...
+├── metadata.csv
 └── out/
 ```
 
 Then run:
+
+```python
+from museum_map import build_museum_map
+
+pipeline = build_museum_map(
+    input_dir="project/data/paintings",
+    output_dir="project/out/run_01",
+    metadata_csv="project/metadata.csv",
+)
+```
+
+If you do not have metadata:
 
 ```python
 from museum_map import build_museum_map
@@ -153,7 +195,7 @@ pipeline = build_museum_map(
 
 ## Main output files
 
-After execution, the output directory contains the computational artifacts and the interactive graph.
+After execution, the output directory contains computational artifacts and the interactive graph.
 
 Typical output:
 
@@ -183,11 +225,26 @@ output_dir/
 - `feature_matrix.npy` — combined representation used for clustering
 - `umap_2d.npy` — low-dimensional projection of the collection
 - `cluster_labels.npy` — cluster assignments
-- `df_plot.csv` — metadata and coordinates per image
+- `df_plot.csv` — image paths, metadata, cluster labels, and projection coordinates
 - `config.csv` — run configuration
 - `similarity_graph.html` — interactive graph visualization
 - `thumbs/` — thumbnails used inside the HTML graph
-- `museum_map_export.zip` — packaged result for local sharing or archiving
+- `museum_map_export.zip` — lightweight packaged result for local sharing or archiving
+
+## Lightweight export
+
+The package creates a lightweight export zip for sharing. It contains the visual outputs rather than all heavy numerical arrays.
+
+The export is intended to include:
+
+```text
+similarity_graph.html
+thumbs/
+df_plot.csv
+config.csv
+```
+
+Large files such as embeddings and feature matrices remain in the output directory but are not needed for the interactive demo.
 
 ## What the HTML output contains
 
@@ -199,13 +256,14 @@ It represents the collection as a graph:
 - each node contains a painting thumbnail
 - node border color indicates cluster membership
 - edges connect paintings with strong local similarity
-- hover displays metadata such as artist, style, genre, cluster, and filename
+- metadata such as artist, style, genre, cluster, and filename can be displayed
 
-This file can be opened locally in a browser. If some browsers restrict local file access for thumbnails, it can also be served from a lightweight local server.
+This file can be opened locally in a browser. If a browser restricts local file access for thumbnails, serve the output directory with a lightweight local server.
 
 Example:
 
 ```bash
+cd output_dir
 python -m http.server 8000
 ```
 
@@ -227,6 +285,7 @@ from museum_map import build_museum_map
 pipeline = build_museum_map(
     input_dir="./data/paintings",
     output_dir="./out/run_02",
+    metadata_csv="./metadata.csv",
     batch_size=16,
     n_palette_colors=6,
     weight_clip=1.0,
@@ -234,11 +293,13 @@ pipeline = build_museum_map(
     weight_composition=0.8,
     graph_k_neighbors=3,
     max_per_cluster_for_graph=25,
+    thumb_size=96,
 )
 ```
 
-Important parameters include:
+Important parameters:
 
+- `metadata_csv` — optional CSV file with metadata
 - `batch_size` — embedding batch size
 - `n_palette_colors` — number of dominant palette colors
 - `weight_clip` — weight of CLIP embeddings in the combined representation
@@ -248,15 +309,38 @@ Important parameters include:
 - `max_per_cluster_for_graph` — representative sample size per cluster
 - `thumb_size` — thumbnail size used in the HTML graph
 
+## Example with WikiArt-style data
+
+```python
+from museum_map import build_museum_map
+
+pipeline = build_museum_map(
+    input_dir="./wikiart_subset/images",
+    output_dir="./wikiart_subset/output",
+    metadata_csv="./wikiart_subset/metadata.csv",
+    batch_size=16,
+    n_palette_colors=5,
+    weight_clip=1.0,
+    weight_palette=0.45,
+    weight_composition=0.70,
+    graph_k_neighbors=3,
+    max_per_cluster_for_graph=30,
+    thumb_size=96,
+)
+
+print("Graph:", pipeline.graph_html_path_)
+print("Export:", pipeline.export_zip_path_)
+```
+
 ## Current limitations
 
 At the current stage, the package has several deliberate limitations:
 
 - it expects local image folders rather than remote datasets
-- it does not yet ingest structured metadata tables automatically
 - it is optimized for exploratory work rather than industrial-scale deployment
-- it does not yet include optional graph-embedding extensions such as Node2Vec
-- it currently exports the graph view as the main interactive artifact
+- metadata support is currently CSV-based
+- it exports the graph view as the main interactive artifact
+- optional graph-embedding extensions such as Node2Vec are not part of the package API yet
 
 These points are expected development directions rather than defects.
 
@@ -265,26 +349,12 @@ These points are expected development directions rather than defects.
 Planned next steps include:
 
 - command-line interface
-- optional metadata ingestion from CSV/JSON
+- richer metadata formats such as JSON
 - optional museum map scatter export
 - cluster summaries and automatic cluster labels
 - graph-aware extensions such as Node2Vec
 - richer support for digital humanities and museum collection workflows
 - automated release workflow for PyPI
-
-## Minimal example
-
-```python
-from museum_map import build_museum_map
-
-pipeline = build_museum_map(
-    input_dir="./paintings",
-    output_dir="./museum_map_output",
-)
-
-print("Graph saved to:", pipeline.graph_html_path_)
-print("ZIP saved to:", pipeline.export_zip_path_)
-```
 
 ## Citation
 
